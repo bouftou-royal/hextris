@@ -124,13 +124,14 @@ function Hex(sideLength) {
 		}
 
 		this.position = this.position % this.sides;
+		var stepAngle = steps * (360 / this.sides);
 		this.blocks.forEach(function(blocks) {
 			blocks.forEach(function(block) {
-				block.targetAngle = block.targetAngle - steps * (360 / this.sides);
+				block.targetAngle = block.targetAngle - stepAngle;
 			});
 		});
 
-		this.targetAngle = this.targetAngle - steps * (360 / this.sides);
+		this.targetAngle = this.targetAngle - stepAngle;
 				this.lastRotate = Date.now();
 	};
 
