@@ -6,7 +6,7 @@ function Hex(sideLength) {
 	this.position = 0;
 	this.dy = 0;
 	this.dt = 1;
-	this.sides = 6;
+	this.sides = 8;
 	this.blocks = [];
 	this.angle = 180 / this.sides;
 	this.targetAngle = this.angle;
@@ -26,7 +26,7 @@ function Hex(sideLength) {
 	}
 
 	this.shake = function(obj) { //lane as in particle lane
-		var angle = 30 + obj.lane * 60;
+		var angle = 90 - laneAngle(obj.lane, this.sides);
 		angle *= Math.PI / 180;
 		var dx = Math.cos(angle) * obj.magnitude;
 		var dy = Math.sin(angle) * obj.magnitude;
@@ -50,7 +50,7 @@ function Hex(sideLength) {
 		this.shakes.push({lane:block.fallingLane, magnitude:4.5 * (window.devicePixelRatio ? window.devicePixelRatio : 1) * (settings.scale)});
 		lane += this.position;
 		lane = (lane + this.sides) % this.sides;
-		block.distFromHex = MainHex.sideLength / 2 * Math.sqrt(3) + block.height * this.blocks[lane].length;
+		block.distFromHex = polygonApothem(MainHex.sideLength, this.sides) + block.height * this.blocks[lane].length;
 		this.blocks[lane].push(block);
 		block.attachedLane = lane;
 		block.checked = 1;
@@ -64,8 +64,8 @@ function Hex(sideLength) {
 		if (position !== undefined) {
 			arr = tArr;
 			if (position <= 0) {
-				if (block.distFromHex - block.iter * this.dt * settings.scale - (this.sideLength / 2) * Math.sqrt(3) <= 0) {
-					block.distFromHex = (this.sideLength / 2) * Math.sqrt(3);
+				if (block.distFromHex - block.iter * this.dt * settings.scale - polygonApothem(this.sideLength, this.sides) <= 0) {
+					block.distFromHex = polygonApothem(this.sideLength, this.sides);
 					block.settled = 1;
 					block.checked = 1;
 				} else {
@@ -96,8 +96,8 @@ function Hex(sideLength) {
 					this.addBlock(block);
 				}
 			} else {
-				if (block.distFromHex + block.iter * this.dt * settings.scale - (this.sideLength / 2) * Math.sqrt(3) <= 0) {
-					block.distFromHex = (this.sideLength / 2) * Math.sqrt(3);
+				if (block.distFromHex + block.iter * this.dt * settings.scale - polygonApothem(this.sideLength, this.sides) <= 0) {
+					block.distFromHex = polygonApothem(this.sideLength, this.sides);
 					this.addBlock(block);
 				}
 			}
@@ -120,17 +120,17 @@ function Hex(sideLength) {
 		}
 
 		while (this.position < 0) {
-			this.position += 6;
+			this.position += this.sides;
 		}
 
 		this.position = this.position % this.sides;
 		this.blocks.forEach(function(blocks) {
 			blocks.forEach(function(block) {
-				block.targetAngle = block.targetAngle - steps * 60;
+				block.targetAngle = block.targetAngle - steps * (360 / this.sides);
 			});
 		});
 
-		this.targetAngle = this.targetAngle - steps * 60;
+		this.targetAngle = this.targetAngle - steps * (360 / this.sides);
 				this.lastRotate = Date.now();
 	};
 

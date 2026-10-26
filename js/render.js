@@ -11,7 +11,7 @@ function render() {
 			op += 0.01;
 		}
 		ctx.globalAlpha = op;
-		drawPolygon(trueCanvas.width / 2 , trueCanvas.height / 2 , 6, (settings.rows * settings.blockHeight) * (2/Math.sqrt(3)) + settings.hexWidth, 30, grey, false,6);
+		drawPolygon(trueCanvas.width / 2 , trueCanvas.height / 2 , MainHex.sides, outerBoundaryRadius(), 180 / MainHex.sides, grey, false,6);
 		drawTimer();
 		ctx.globalAlpha = 1;
 	}
@@ -65,9 +65,14 @@ function render() {
 	settings.blockHeight = settings.baseBlockHeight * settings.scale;
 }
 
+// radius of the outer grey polygon that blocks must stay inside
+function outerBoundaryRadius() {
+	return polygonRadius(settings.rows * settings.blockHeight, MainHex.sides) + settings.hexWidth;
+}
+
 function renderBeginningText() {
-	var upperheight = (trueCanvas.height/2) - ((settings.rows * settings.blockHeight) * (2/Math.sqrt(3))) * (5/6);
-	var lowerheight = (trueCanvas.height/2) + ((settings.rows * settings.blockHeight) * (2/Math.sqrt(3))) * (11/16);
+	var upperheight = (trueCanvas.height/2) - polygonRadius(settings.rows * settings.blockHeight, MainHex.sides) * (5/6);
+	var lowerheight = (trueCanvas.height/2) + polygonRadius(settings.rows * settings.blockHeight, MainHex.sides) * (11/16);
     var text = '';
     var mob, fontSize;
     if(/mobile|Mobile|iOS|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {

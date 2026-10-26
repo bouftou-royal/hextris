@@ -59,7 +59,7 @@ function drawScoreboard() {
 }
 
 function clearGameBoard() {
-	drawPolygon(trueCanvas.width / 2, trueCanvas.height / 2, 6, trueCanvas.width / 2, 30, hexagonBackgroundColor, 0, 'rgba(0,0,0,0)');
+	drawPolygon(trueCanvas.width / 2, trueCanvas.height / 2, MainHex.sides, trueCanvas.width / 2, 180 / MainHex.sides, hexagonBackgroundColor, 0, 'rgba(0,0,0,0)');
 }
 
 function drawPolygon(x, y, sides, radius, theta, fillColor, lineWidth, lineColor) {

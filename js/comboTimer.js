@@ -2,16 +2,18 @@ function drawTimer() {
 	if(gameState==1){
 		var leftVertexes = [];
 		var rightVertexes = [];
+		var sides = MainHex.sides;
 	if(MainHex.ct - MainHex.lastCombo < settings.comboTime){
-		for(var i=0;i<6;i++){
+		for(var i=0;i<sides;i++){
 			var done = (MainHex.ct -MainHex.lastCombo);
-			if(done<(settings.comboTime)*(5-i)*(1/6)){
-				leftVertexes.push(calcSide(i,i+1,1,1));
-								rightVertexes.push(calcSide(12-i,11-i,1,1));
+			if(done<(settings.comboTime)*(sides-1-i)*(1/sides)){
+				leftVertexes.push(calcSide(i,i+1,1));
+				rightVertexes.push(calcSide(-i,-i-1,1));
 			}
 			else{
-				leftVertexes.push(calcSide(i,i+1,1-((done*6)/settings.comboTime)%(1),1));
-				rightVertexes.push(calcSide(12-i,11-i,1-((done*6)/settings.comboTime)%(1),1));
+				var fraction = 1-((done*sides)/settings.comboTime)%(1);
+				leftVertexes.push(calcSide(i,i+1,fraction));
+				rightVertexes.push(calcSide(-i,-i-1,fraction));
 				break;
 			}
 		}
@@ -21,34 +23,27 @@ function drawTimer() {
 	}
 }
 
-function calcSide(startVertex,endVertex,fraction,offset){
-	startVertex = (startVertex+offset)%12;
-	endVertex = (endVertex+offset)%12;
+// point k of the outer polygon outline: even k are side midpoints, odd k are vertices,
+// k = 0 is the bottom midpoint and positive k walk up the left side
+function timerPoint(k) {
+	var sides = MainHex.sides;
+	var radius = outerBoundaryRadius();
+	var dist = (k % 2 === 0) ? polygonApothem(radius, sides) : radius;
+	var theta = k * (180 / sides) * (Math.PI / 180);
+	return [trueCanvas.width/2 - Math.sin(theta) * dist, trueCanvas.height/2 + Math.cos(theta) * dist];
+}
+
+function calcSide(startVertex,endVertex,fraction){
 	ctx.globalAlpha=1;
 	ctx.beginPath();
 	ctx.lineCap = "round";
 
-	var radius = (settings.rows * settings.blockHeight) * (2/Math.sqrt(3)) + settings.hexWidth ;
-	var halfRadius = radius/2;
-	var triHeight = radius *(Math.sqrt(3)/2);
-	var Vertexes =[
-		[(halfRadius*3)/2,triHeight/2],
-		[radius,0],
-		[(halfRadius*3)/2,-triHeight/2],
-		[halfRadius,-triHeight],
-		[0,-triHeight],
-		[-halfRadius,-triHeight],
-		[-(halfRadius*3)/2,-triHeight/2],
-		[-radius,0],
-		[-(halfRadius*3)/2,triHeight/2],
-		[-halfRadius,triHeight],
-		[0,triHeight],
-		[halfRadius,triHeight]
-	].reverse();
-	var startX =trueCanvas.width/2 + Vertexes[startVertex][0];
-	var startY =trueCanvas.height/2 + Vertexes[startVertex][1];
-	var endX = trueCanvas.width/2 + Vertexes[endVertex][0];
-	var endY = trueCanvas.height/2 + Vertexes[endVertex][1];
+	var start = timerPoint(startVertex);
+	var end = timerPoint(endVertex);
+	var startX = start[0];
+	var startY = start[1];
+	var endX = end[0];
+	var endY = end[1];
 		return [[startX,startY],[((endX-startX)*fraction)+startX,((endY-startY)*fraction)+startY]];
 }
 function drawSide(vertexes){
